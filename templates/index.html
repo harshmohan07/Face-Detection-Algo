@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Detector</title>
+</head>
+<body>
+    <h1>Welcome to Face Detector</h1>
+    <form action="#" method="POST" enctype="multipart/form-data">
+    
+        {% csrf_token %}
+        {{ form.as_table }}
+
+        <input type="submit" value="upload">
+
+    </form>
+
+
+    {% if upload %}
+    
+        <table>
+            <tr>
+                <td>Faces</td>
+                {% for c in result.count %}
+                    <td>
+                        <img src="/media/ml_out/roi_{{ c }}.jpg" alt="">
+                    </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>Multiple Faces Detected</td>
+                <td> {{result.Multiple_Faces_Detected}} </td>
+            </tr>
+            <tr>
+                <td>No Faces Detected</td>
+                <td> {{result.No_Faces_Detected }}</td>
+            </tr>
+            <!-- <tr>
+                <td>Closed Eyes Detected</td>
+                <td> {{result.Closed_Eyes_Detected }}</td>
+            </tr> -->
+            <tr>
+                <td>Lower Body Detected</td>
+                <td> {{result.Lower_Body_Detected}} </td>
+            </tr>
+            <tr>
+                <td>Invalid Face Detected</td>
+                <td> {{result.Invalid_Face_Detected }}</td>
+            </tr>
+            <tr>
+                <td>No Eyes Detected</td>
+                <td> {{result.No_Eyes_Detected}} </td>
+            </tr>
+            <tr>
+                <td>No Mouth Detected</td>
+                <td> {{result.No_Mouth_Detected}} </td>
+            </tr>
+            <tr>
+                <td>Text Detected</td>
+                <td> {{result.Text_Detected}}</td>
+            </tr>
+            <tr>
+                <td>Fit for submission or not : </td>
+                <td> {{result.Final_criteria}} </td>
+            </tr>
+
+        </table>
+    
+    {% endif %}
+
+
+</body>
+</html>
