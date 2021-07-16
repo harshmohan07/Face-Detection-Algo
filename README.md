@@ -2,7 +2,7 @@
 It consists of all the constituents of a web app
 
 The main Pipeline model file is in the "app" folder.
-Put the media and the .gitignore are both in the .gitignore file so that theywon't be commited.
+Put the media and the .gitignore are both in the .gitignore file so that they won't be commited.
 
 TODO:
 1. Improve the back end and include all the future implementations mentioned in the pitch deck and also to rectify the errors which we spotted before.
