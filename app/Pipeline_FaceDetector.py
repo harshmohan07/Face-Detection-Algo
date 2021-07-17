@@ -42,14 +42,42 @@ def facedetector(path):
         queries.append("Multiple Faces Detected")
         queries.append(False)
         return queries
-    # coord1,closedeyedetect=closedeyesspecs.detectMultiScale2(img)
-    # if len(closedeyedetect) != 0:
-    #     assesment_dict["Closed_Eyes_Detected"] = True
+
+    # Used for cartoon detection
+    img_og = Image.open(path)#cropped face image
+    img_re = img_og.resize((400,400))
+    count = 0
+    same_color = 0
+    compare1 = []
+    for i in range(0,396,4):
+        for j in range(0,396,4):
+            for m in range(4):
+                for n in range(4):
+                    compare1.append(img_re.getpixel((i+m,j+n)))
+            
+            for pix in compare1 :
+                if compare1[0]!= pix :
+                    pass
+                else :
+                    count +=1
+                    
+            if count > 15 :
+                same_color +=1
+            else :
+                pass
+                
+            count = 0
+            compare1 = []    
+    if same_color >= 750 :   
+        queries.append("Cartoonistic Face Detected")
+        queries.append(False)
+        return queries
+
     coord2,lowerbodydetect=lower_body_detect.detectMultiScale2(img, minNeighbors = 10)
     if len(lowerbodydetect) != 0:
         queries.append("Lower Body Detected")
+
     for x,y,w,h in faces:
-        count.append(lim)
         face_roi = img[y:y+h,x:x+h].copy() # croping the image
         cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0))
             
@@ -97,6 +125,7 @@ def facedetector(path):
             text = pytesseract.image_to_string(cropped)
             if bool(text.strip()) == True:
                 queries.append("Text Detected")
+                break
 
         ## Final Detection : 
         if len(queries) == 1:
@@ -104,6 +133,7 @@ def facedetector(path):
         else:
             queries.append(False)
     return queries
+
 
 
 
