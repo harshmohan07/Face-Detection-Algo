@@ -17,55 +17,18 @@
 
     </form>
 
+    <!-- The first element of the list shows the number of faces in the photo and the last element 
+        shows whether the image is accepted or not. All the middle elements represent the queries (if any).-->
 
     {% if upload %}
     
         <table>
-            <tr>
-                <td>Faces</td>
-                {% for c in result.count %}
-                    <td>
-                        <img src="/media/ml_out/roi_{{ c }}.jpg" alt="">
-                    </td>
-                {% endfor %}
-            </tr>
-            <tr>
-                <td>Multiple Faces Detected</td>
-                <td> {{result.Multiple_Faces_Detected}} </td>
-            </tr>
-            <tr>
-                <td>No Faces Detected</td>
-                <td> {{result.No_Faces_Detected }}</td>
-            </tr>
-            <!-- <tr>
-                <td>Closed Eyes Detected</td>
-                <td> {{result.Closed_Eyes_Detected }}</td>
-            </tr> -->
-            <tr>
-                <td>Lower Body Detected</td>
-                <td> {{result.Lower_Body_Detected}} </td>
-            </tr>
-            <tr>
-                <td>Invalid Face Detected</td>
-                <td> {{result.Invalid_Face_Detected }}</td>
-            </tr>
-            <tr>
-                <td>No Eyes Detected</td>
-                <td> {{result.No_Eyes_Detected}} </td>
-            </tr>
-            <tr>
-                <td>No Mouth Detected</td>
-                <td> {{result.No_Mouth_Detected}} </td>
-            </tr>
-            <tr>
-                <td>Text Detected</td>
-                <td> {{result.Text_Detected}}</td>
-            </tr>
-            <tr>
-                <td>Fit for submission or not : </td>
-                <td> {{result.Final_criteria}} </td>
-            </tr>
-
+            <img src="\media\ml_out\process.jpg" alt="">
+            {% for c in result %}
+                <tr>
+                    <td> {{ c }} </td>
+                </tr>
+            {% endfor %}
         </table>
     
     {% endif %}

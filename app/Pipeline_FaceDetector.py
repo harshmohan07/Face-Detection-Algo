@@ -16,72 +16,75 @@ closedeyesspecs=cv2.CascadeClassifier(os.path.join(STATIC_DIR,'./cascade_classif
 lower_body_detect=cv2.CascadeClassifier(os.path.join(STATIC_DIR,'./cascade_classifier/haarcascade_lowerbody.xml'))
 
 # "Closed_Eyes_Detected" : False,
-assesment_dict = {"No_Faces_Detected" : False, "Multiple_Faces_Detected" : False, "Lower_Body_Detected" : False ,"Invalid_Face_Detected" : False,
-                    "No_Eyes_Detected" : False, "No_Mouth_Detected" : False, "Text_Detected" : False, "Final_criteria" : True}
 
 def facedetector(path):
+    queries = [0]
     count = []
-    lim= 1
+    lim= 0
+
     ## This code will handle the first three and the last point of the problem statement.
     ## Make changes in the print statements as per the I/O of the file. Use the cv2.circles and cv2.rectangles while
     ## cross verifying else just comment them.
     img = cv2.imread(path)
-    cv2.imwrite(os.path.join(settings.MEDIA_ROOT,'ml_out/process.jpg'),img)
     faces, num_detection_face =frontal_face.detectMultiScale2(img,minNeighbors=20)
+    cv2.imwrite(os.path.join(settings.MEDIA_ROOT,'ml_out/process.jpg'),img)
     number_of_faces = len(faces)
+    queries[0] = number_of_faces
     if number_of_faces == 0:
         ######## Modification Left ###########
         ######## We have to exit our programme from here #########
-        assesment_dict["No_Faces_Detected"] = True
-        assesment_dict["Final_criteria"] = False
-        return assesment_dict
+        queries.append("No Face Detected")
+        queries.append(False)
+        return queries
     elif number_of_faces > 1:
         ######## Modification Left ###########
         ######## We have to exit our programme from here #########
-        assesment_dict["Multiple_Faces_Detected"] = True
-        assesment_dict["Final_criteria"] = False
-        return assesment_dict
+        queries.append("Multiple Faces Detected")
+        queries.append(False)
+        return queries
     # coord1,closedeyedetect=closedeyesspecs.detectMultiScale2(img)
     # if len(closedeyedetect) != 0:
     #     assesment_dict["Closed_Eyes_Detected"] = True
     coord2,lowerbodydetect=lower_body_detect.detectMultiScale2(img, minNeighbors = 10)
     if len(lowerbodydetect) != 0:
-        assesment_dict["Lower_Body_Detected"] = True
+        queries.append("Lower Body Detected")
     for x,y,w,h in faces:
         count.append(lim)
         face_roi = img[y:y+h,x:x+h].copy() # croping the image
-        # cv2.imwrite(os.path.join(settings.MEDIA_ROOT,'ml_out/roi_{}.jpg'.format(lim)),face_roi)
         cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0))
             
-    #apply to cascasde classifier (eyes)
+    # apply to cascasde classifier (eyes)
         eyesl,num_detection_eyesl = eyel_class.detectMultiScale2(face_roi,minNeighbors = 5)
-        eyesr,num_detection_eyesr = eyer_class.detectMultiScale2(face_roi,minNeighbors = 10)
+        eyesr,num_detection_eyesr = eyer_class.detectMultiScale2(face_roi,minNeighbors = 5)
         if len(eyesr) == 0 and len(eyesl) == 0:
-            assesment_dict["No_Eyes_Detected"] = True
+            queries.append("No Eyes Detected")
         for ex, ey, ew, eh in eyesl:
             cx = x+ex+ew//2
             cy = y+ey+eh//2
             if cx<x or cx>(x+w) or cy<y or cy>(y+w):
-                assesment_dict["Invalid_Face_Detected"] = True
+                queries.append("Invalid Face Detected")
                 #This is the condition for checking if eyes are outside the face XD
             r = eh //2
-            #cv2.circle(img,(cx,cy),r,(255,0,255),2)
+            cv2.circle(img,(cx,cy),r,(255,0,255),2)
         for ex, ey, ew, eh in eyesr:
             cx = x+ex+ew//2
             cy = y+ey+eh//2
             if cx<x or cx>(x+w) or cy<y or cy>(y+w):
-                assesment_dict["Invalid_Face_Detected"] = True
+                queries.append("Invalid Face Detected")
                 #This is the condition for checking if eyes are outside the face XD
-            #r = eh //2
-            #cv2.circle(img,(cx,cy),r,(255,0,255),2)
+            r = eh //2
+            cv2.circle(img,(cx,cy),r,(255,0,255),2)
         #apply to cascasde classifier (mouth)
         smiles , num_detection_smile = smile_dect.detectMultiScale2(face_roi,minNeighbors = 20)
         if len(smiles) == 0:
-            assesment_dict["No_Mouth_Detected"] = True
-#         for sx,sy, sw,sh in smiles:
-#             #cv2.rectangle(img,(x+sx,y+sy),(x+sx+sw,y+sy+sh),(255,0,0),2)
+            queries.append("No Mouth Detected")
+        for sx,sy, sw,sh in smiles:
+            cv2.rectangle(img,(x+sx,y+sy),(x+sx+sw,y+sy+sh),(255,0,0),2)
+
+#This part is basically for text and watermark detection.
         pytesseract.pytesseract.tesseract_cmd = '/usr/local/Cellar/tesseract/4.1.1/bin/tesseract'
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img1 = cv2.imread(path)
+        gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
         ret, thresh1 = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)
         rect_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (18, 18))
         dilation = cv2.dilate(thresh1, rect_kernel, iterations = 1)
@@ -89,19 +92,18 @@ def facedetector(path):
         im2 = img.copy()
         for cnt in contours:
             x, y, w, h = cv2.boundingRect(cnt)
-            rect = cv2.rectangle(im2, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            #rect = cv2.rectangle(im2, (x, y), (x + w, y + h), (0, 255, 0), 2)
             cropped = im2[y:y + h, x:x + w]
             text = pytesseract.image_to_string(cropped)
             if bool(text.strip()) == True:
-                assesment_dict["Text_Detected"] = True
+                queries.append("Text Detected")
 
         ## Final Detection : 
-        for i in assesment_dict.keys():
-            if assesment_dict[i] == True and i != "Final_criteria":
-                assesment_dict["Final_criteria"] = False
-        lim += 1
-    assesment_dict["count"] = count
-    return assesment_dict
+        if len(queries) == 1:
+            queries.append(True)
+        else:
+            queries.append(False)
+    return queries
 
 
 

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;900&display=swap');
+      @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro");
+      html {
+          background-color:black;
+          -webkit-background-size: cover;
+          -moz-background-size: cover;
+          -o-background-size: cover;
+          background-size: cover;
+              align-items: center;
+        text-align: center;
+        overflow: hidden;
+        justify-content: center;
+        place-items: center;
+        font-family: poppins;
+        overflow: scroll;
+              font-family: poppins;
+              overflow: scroll;
+      }
+
+      .my-element {
+        background: url("images/my-image.png") no-repeat;
+
+        // substitute for your image dimensions
+        @include responsive-bg-image(204, 81);
+      }
+      }
+      img{
+        max-width: 180 px;
+        border-style: inset;
+      }
+      input[type=file]{
+      padding: 100px 100px;
+      background:#2d2d2d;
+      font-family: poppins;
+      border-radius: 12px;
+      }
+      Button{
+      padding: 4px 20px;
+      background: #556469;
+      font-family: poppins;
+      border-style: outset;
+      font-size: 15px;
+      }
+      p{
+      font-size: 70px;
+      color:#45A29E;
+      }
+
+
+      div {
+        font-weight: 100;
+        text-align: centre;
+        font-size: 20px;
+        font-family: Hack, sans-serif;
+        text-transform: uppercase;
+        background: linear-gradient(90deg, #000, #45A29E, #000);
+        letter-spacing: 5px;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-repeat: no-repeat;
+        background-size: 80%;
+        animation: shine 3s linear infinite;
+        position: relative;
+      }
+      table,th {
+  border: 1px solid #3aafa9;
+  align: center;
+  text-align: left;
+}
+th, td {
+  border-bottom: 1px solid #3aafa9;
+}
+tr:nth-child(even) {background-color: #1F2833;}
+table {
+  margin-left: auto;
+  margin-right: auto;}
+      @keyframes shine {
+        0% {
+          background-position-x: -500%;
+        }
+        100% {
+          background-position-x: 500%;
+        }
+      }
+
+      form{padding: 0.1; background:#3aafa9; font-family: poppins;font-size: 15px;}
+      container{ height: 1000 px;
+
+}
+      
+    </style>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+
+    <title>Face Detector</title>
+  </head>
+
+  <body>
+    <img src="{% static 'logo.jpg' %}" />
+    <p style="color: #3aafa9">Face</p>
+    <p style="color: #fff">Detector</p>
+    <div>Choosing good profile photo made easy!!</div>
+    <p>
+      <input
+        type="file"
+        accept="image/*"
+        name="image"
+        id="file"
+        onchange="loadFile(event)"
+        style="display: none"
+      />
+    </p>
+    <!-- <button>
+      <label for="file" style="cursor: pointer">Select Image</label>
+    </button> -->
+    <p><img id="output" width="500" /></p>
+
+    <form action="#" method="POST" enctype="multipart/form-data" height=" 48">
+     <button> {% csrf_token %} {{ form.as_table }} </button>
+      <input type="submit" value="upload" style="background-color:#556469"; width:9em" />
+    </form>
+
+    {% if upload %}
+
+    <div>
+      <img src="\media\ml_out\process.jpg" alt="" />
+    </div>
+      
+      <table style="color: white">
+        <tr>
+          <td>Faces</td>
+          {% for c in result.count %}
+          <td>
+            <img src="/media/ml_out/roi_{{ c }}.jpg" alt="" />
+          </td>
+          {% endfor %}
+        </tr>
+        <tr>
+          <td>Multiple Faces Detected</td>
+          <td>{{result.Multiple_Faces_Detected}}</td>
+        </tr>
+        <tr>
+          <td>No Faces Detected</td>
+          <td>{{result.No_Faces_Detected }}</td>
+        </tr>
+        <!-- <tr>
+                <td>Closed Eyes Detected</td>
+                <td> {{result.Closed_Eyes_Detected }}</td>
+            </tr> -->
+        <tr>
+          <td>Lower Body Detected</td>
+          <td>{{result.Lower_Body_Detected}}</td>
+        </tr>
+        <tr>
+          <td>Invalid Face Detected</td>
+          <td>{{result.Invalid_Face_Detected }}</td>
+        </tr>
+        <tr>
+          <td>No Eyes Detected</td>
+          <td>{{result.No_Eyes_Detected}}</td>
+        </tr>
+        <tr>
+          <td>No Mouth Detected</td>
+          <td>{{result.No_Mouth_Detected}}</td>
+        </tr>
+        <!-- <tr>
+                <td>Text Detected</td>
+                <td> {{result.Text_Detected}}</td>
+            </tr> -->
+        <tr>
+          <td>Accepted(T/F)</td>
+          <td>{{result.Final_criteria}}</td>
+        </tr>
+      </table>
+    {% endif %}
+     
+    <script>
+      var loadFile = function (event) {
+        var image = document.getElementById("output");
+        image.src = URL.createObjectURL(event.target.files[0]);
+      };
+    </script>
+
+  </body>
+</html>
