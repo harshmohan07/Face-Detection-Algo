@@ -15,3 +15,4 @@ harshmohan07 : 1. Instead of a dictionary, added a list as output. Number of fac
                element. In between these, there will be queries rlated to the image(if any)
                2. Also added the index.html filr to show this output. Also added the previous final index.html which was missing in the last commit.
                3. Basic cartoon detection feature added.
+               4. Cartoon Detection feature added to exact position for proper functioning.
