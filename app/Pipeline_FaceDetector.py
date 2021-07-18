@@ -43,42 +43,12 @@ def facedetector(path):
         queries.append(False)
         return queries
 
-    # Used for cartoon detection
-    img_og = Image.open(path)#cropped face image
-    img_re = img_og.resize((400,400))
-    count = 0
-    same_color = 0
-    compare1 = []
-    for i in range(0,396,4):
-        for j in range(0,396,4):
-            for m in range(4):
-                for n in range(4):
-                    compare1.append(img_re.getpixel((i+m,j+n)))
-            
-            for pix in compare1 :
-                if compare1[0]!= pix :
-                    pass
-                else :
-                    count +=1
-                    
-            if count > 15 :
-                same_color +=1
-            else :
-                pass
-                
-            count = 0
-            compare1 = []    
-    if same_color >= 750 :   
-        queries.append("Cartoonistic Face Detected")
-        queries.append(False)
-        return queries
-
     coord2,lowerbodydetect=lower_body_detect.detectMultiScale2(img, minNeighbors = 10)
     if len(lowerbodydetect) != 0:
         queries.append("Lower Body Detected")
 
     for x,y,w,h in faces:
-        face_roi = img[y:y+h,x:x+h].copy() # croping the image
+        face_roi = img[y:y+h,x:x+w].copy() # croping the image
         cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0))
             
     # apply to cascasde classifier (eyes)
@@ -109,6 +79,38 @@ def facedetector(path):
         for sx,sy, sw,sh in smiles:
             cv2.rectangle(img,(x+sx,y+sy),(x+sx+sw,y+sy+sh),(255,0,0),2)
 
+        # Used for cartoon detection
+        img_og = Image.open(path)#cropped face image
+        area = (x,y,x+w,y+h)
+        img_og = img_og.crop(area)
+        img_re = img_og.resize((400,400))
+        count = 0
+        same_color = 0
+        compare1 = []
+        for i in range(0,396,4):
+            for j in range(0,396,4):
+                for m in range(4):
+                    for n in range(4):
+                        compare1.append(img_re.getpixel((i+m,j+n)))
+                
+                for pix in compare1 :
+                    if compare1[0]!= pix :
+                        pass
+                    else :
+                        count +=1
+                        
+                if count > 15 :
+                    same_color +=1
+                else :
+                    pass
+                    
+                count = 0
+                compare1 = []    
+        if same_color >= 750 :   
+            queries.append("Cartoonistic Face Detected")
+            queries.append(False)
+            return queries
+
 #This part is basically for text and watermark detection.
         pytesseract.pytesseract.tesseract_cmd = '/usr/local/Cellar/tesseract/4.1.1/bin/tesseract'
         img1 = cv2.imread(path)
@@ -120,7 +122,7 @@ def facedetector(path):
         im2 = img.copy()
         for cnt in contours:
             x, y, w, h = cv2.boundingRect(cnt)
-            #rect = cv2.rectangle(im2, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            rect = cv2.rectangle(im2, (x, y), (x + w, y + h), (0, 255, 0), 2)
             cropped = im2[y:y + h, x:x + w]
             text = pytesseract.image_to_string(cropped)
             if bool(text.strip()) == True:
@@ -133,7 +135,3 @@ def facedetector(path):
         else:
             queries.append(False)
     return queries
-
-
-
-
