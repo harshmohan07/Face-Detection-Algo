@@ -1,4 +1,4 @@
-It consists of all the constituents of a web app
+It consists of all the constituents of a web app in Django.
 
 The main Pipeline model file is in the "app" folder.
    
@@ -9,3 +9,5 @@ What this code does :
 • Differentiate avatar/cartoon images from real human faces.
 • Reject photos that have a face, but face is part of a poster, or id card.
 • Identify very small face regions from photo and enlarge to create a thumbnail.
+
+Mainly uses OpenCV and Tesseract
